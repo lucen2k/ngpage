@@ -21,11 +21,14 @@ app.directive('postsPagination', function()
 });
 
 app.factory('Post', function($resource){  
-  return $resource('post');
+  return $resource('posts-json');
 });
 
-app.controller('postController', ['$http', '$scope', function($http, $scope)
+app.controller('postController', function($http, $scope, Post)
 {
+  // ロードアイコンの表示
+  $scope.loading = true;
+  
   $scope.posts = [];
   $scope.totalPages = 0;
   $scope.currentPage = 1;
@@ -36,19 +39,19 @@ app.controller('postController', ['$http', '$scope', function($http, $scope)
     if(pageNumber===undefined){
       pageNumber = '1';
     }
-    Post.get({page: pageNumber},function(response)
+    Post.get({page: pageNumber}, function(response)
     {
-      $scope.posts        = response.data;
-      $scope.totalPages   = response.last_page;
-      $scope.currentPage  = response.current_page;
+      $scope.posts       = response.data;
+      $scope.totalPages  = response.last_page;
+      $scope.currentPage = response.current_page;
 
       // Pagination Range
       var pages = [];
-
-      for(var i=1;i<=response.last_page;i++) {          
+      for(var i=1; i<=response.last_page; i++){
         pages.push(i);
       }
-      $scope.range = pages; 
+      $scope.range = pages;
+      $scope.loading = false;
     });
   };
-}]);
+});
